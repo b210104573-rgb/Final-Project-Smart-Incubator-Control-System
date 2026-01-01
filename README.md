@@ -1,6 +1,6 @@
 # Smart Egg Incubator Monitoring and Control System
 
-Final project for **Mechatronics Engineering Design** course.
+Final project **Mechatronics Engineering Design**
 
 ---
 
