@@ -70,9 +70,9 @@ The goal of the project is to increase incubation reliability, reduce manual int
 ## 📷 System Overview
 
 ### System Block Diagram
-![Circuit Schematic](images/pro-1.png)
+![PROTEUS design](images/pro-1.png)
 ### Circuit Schematic
-![Circuit Schematic](images/Full-cad-rednder-3d.png)
+![3D CAD](images/Full-cad-rednder-3d.png)
 
 
 
