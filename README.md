@@ -63,3 +63,17 @@ The goal of the project is to increase incubation reliability, reduce manual int
 6. SMS alerts are sent when values exceed safe limits.
 
 
+
+
+////////
+
+## 📷 System Overview
+
+### System Block Diagram
+![System Block Diagram](2.tif)
+
+### Circuit Schematic
+![Circuit Schematic](images/circuit_schematic.png)
+
+
+
