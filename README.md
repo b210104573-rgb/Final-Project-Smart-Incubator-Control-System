@@ -70,10 +70,9 @@ The goal of the project is to increase incubation reliability, reduce manual int
 ## 📷 System Overview
 
 ### System Block Diagram
-![System Block Diagram](images/pro 1.png)
-
+![Circuit Schematic](images/pro1.png)
 ### Circuit Schematic
-![Circuit Schematic](images/circuit_schematic.png)
+![Circuit Schematic](images/Full-cad-rednder-3d.png)
 
 
 
