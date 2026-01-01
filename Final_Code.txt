@@ -1,7 +1,9 @@
 /*
 ====================================================
  Final Project – Incubator Control System
- Course: Leisna Udionlu
+ Title : Design of an Incubator Monitoring and Control System Using Wireless Communication and Sensor Technologies
+ Course: Final Project Design
+ Supervisor : Doç. Dr. SERKAN DERELİ
  Description:
  This code controls an incubator system by monitoring
  temperature and humidity, controlling heater,
@@ -157,3 +159,4 @@ void loop()
 
   delay(1000);
 }
+
