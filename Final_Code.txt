@@ -1,0 +1,159 @@
+/*
+====================================================
+ Final Project – Incubator Control System
+ Course: Leisna Udionlu
+ Description:
+ This code controls an incubator system by monitoring
+ temperature and humidity, controlling heater,
+ humidifier, and egg turning motor.
+ It also sends SMS alerts using a GSM module.
+====================================================
+*/
+
+#include <DHT.h>
+#include <LiquidCrystal.h>
+#include <SoftwareSerial.h>
+
+/* ================= SENSOR ================= */
+#define DHTPIN 8
+#define DHTTYPE DHT11
+DHT dht(DHTPIN, DHTTYPE);
+
+/* ================= LCD ================= */
+LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
+
+/* ================= RELAYS ================= */
+#define RELAY_HEATER 7     // Heater lamp
+#define RELAY_TURNER 9     // Egg turning motor
+#define RELAY_HUMID  10    // Humidifier
+
+/* ================= GSM MODULE ================= */
+#define GSM_RX 11          // Arduino RX  <- GSM TX
+#define GSM_TX 12          // Arduino TX  -> GSM RX
+SoftwareSerial gsm(GSM_RX, GSM_TX);
+
+/* ================= LIMIT VALUES ================= */
+#define TEMP_LOW   37.0    // Minimum temperature
+#define TEMP_HIGH  38.0    // Maximum temperature
+#define HUM_LOW    55.0    // Minimum humidity
+
+/* ================= FLAGS ================= */
+bool smsTempSent = false;
+bool smsHumSent  = false;
+
+/* ================= PHONE NUMBER ================= */
+String phoneNumber = "+905526610387";   // Change if needed
+
+/* ================= SMS FUNCTION ================= */
+void sendSMS(String message)
+{
+  gsm.println("AT+CMGF=1");      // Text mode
+  delay(500);
+
+  gsm.print("AT+CMGS=\"");
+  gsm.print(phoneNumber);
+  gsm.println("\"");
+  delay(500);
+
+  gsm.print(message);
+  delay(300);
+
+  gsm.write(26);                 // End of SMS
+  delay(3000);
+}
+
+/* ================= SETUP ================= */
+void setup()
+{
+  Serial.begin(9600);
+  gsm.begin(9600);
+
+  pinMode(RELAY_HEATER, OUTPUT);
+  pinMode(RELAY_TURNER, OUTPUT);
+  pinMode(RELAY_HUMID, OUTPUT);
+
+  digitalWrite(RELAY_HEATER, LOW);
+  digitalWrite(RELAY_TURNER, LOW);
+  digitalWrite(RELAY_HUMID, LOW);
+
+  dht.begin();
+
+  lcd.begin(16, 2);
+  lcd.clear();
+
+  Serial.println("Incubator system started");
+  sendSMS("Incubator system started successfully.");
+}
+
+/* ================= MAIN LOOP ================= */
+void loop()
+{
+  float temperature = dht.readTemperature();
+  float humidity    = dht.readHumidity();
+
+  // Check sensor reading
+  if (isnan(temperature) || isnan(humidity)) {
+    Serial.println("Sensor error");
+    return;
+  }
+
+  /* ---------- LCD DISPLAY ---------- */
+  lcd.setCursor(0, 0);
+  lcd.print("T:");
+  lcd.print(temperature);
+  lcd.print(" C   ");
+
+  lcd.setCursor(0, 1);
+  lcd.print("H:");
+  lcd.print(humidity);
+  lcd.print(" %   ");
+
+  /* ---------- SERIAL MONITOR ---------- */
+  Serial.print("Temp: ");
+  Serial.print(temperature);
+  Serial.print(" | Hum: ");
+  Serial.println(humidity);
+
+  /* ---------- HEATER CONTROL ---------- */
+  if (temperature < TEMP_LOW) {
+    digitalWrite(RELAY_HEATER, HIGH);
+  } else {
+    digitalWrite(RELAY_HEATER, LOW);
+  }
+
+  // High temperature warning
+  if (temperature >= TEMP_HIGH && !smsTempSent) {
+    sendSMS("WARNING: Temperature too high!");
+    smsTempSent = true;
+  }
+
+  if (temperature < TEMP_HIGH) {
+    smsTempSent = false;
+  }
+
+  /* ---------- HUMIDIFIER CONTROL ---------- */
+  if (humidity < HUM_LOW) {
+    digitalWrite(RELAY_HUMID, HIGH);
+
+    if (!smsHumSent) {
+      sendSMS("WARNING: Humidity too low!");
+      smsHumSent = true;
+    }
+  } else {
+    digitalWrite(RELAY_HUMID, LOW);
+    smsHumSent = false;
+  }
+
+  /* ---------- EGG TURNING SYSTEM ---------- */
+  static unsigned long lastTurnTime = 0;
+  unsigned long currentTime = millis();
+
+  if (currentTime - lastTurnTime >= 10000UL) {
+    digitalWrite(RELAY_TURNER, HIGH);
+    delay(3000);
+    digitalWrite(RELAY_TURNER, LOW);
+    lastTurnTime = currentTime;
+  }
+
+  delay(1000);
+}
